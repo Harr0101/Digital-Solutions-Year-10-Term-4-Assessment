@@ -154,10 +154,11 @@ class Control():
             self.terminal.descriptionAdd("\t"+i.name)
 
     def setWeapon(self,command):
-        # Examine
         foundItem = False
+        joinedName = " ".join(command[1:])
+        
         for thing in self.player.weaponsEquipped:
-            if thing.name.lower() == command[1]:
+            if thing.name.lower() == joinedName:
                 self.player.chosenWeapon = thing
                 self.terminal.descriptionAdd(f"You are using {thing.name}")
                 foundItem = True

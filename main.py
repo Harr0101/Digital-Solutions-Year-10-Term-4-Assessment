@@ -79,7 +79,7 @@ for i in range(2):
 # Creating Engineering Room
 engineeringRoom = Room("Engineering Office", "In the centre there is a large worktable. Surrounded by a series of computer stations and 3D printers", terminal)
 password = Computer(engineeringRoom,terminal,control).getPassword()
-Note("yellow sticky note covered in stains",password,newStation,terminal,control)
+Note("yellow sticky note covered in stains",password,engineeringRoom,terminal,control)
 
 # Creating Marketting Room
 markettingRoom = Room("Marketting Office", "Just a bunch of computers and a giant colour palette poster", terminal)
@@ -329,7 +329,10 @@ control.player = player
 
 control.currentRoom = storageRoomSentries
 Note("Data stick","This company is evil, get out and expose it",control.currentRoom,terminal,control)
-control.currentRoom = programmingDesks[0][0]
+starterWeapon = Weapon("Killer eyes","Kills anyone instantly",100,terminal,control)
+control.currentRoom.items.append(starterWeapon)
+control.currentRoom.objects.append(starterWeapon)
+
 
 terminal.descriptionAdd("WELCOME TO Game Name")
 terminal.descriptionAdd("Type 'commands' for hints or type ? at any time")
