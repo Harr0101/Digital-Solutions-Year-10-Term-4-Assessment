@@ -2,13 +2,17 @@ from door import LockedDoor
 
 
 class Item():
-    def __init__(self,name,description,takeable,terminal, control):
+    def __init__(self,name,description,takeable,room,terminal,control):
         self.name = name
         self.description = description
         self.takeable = takeable
         self.terminal = terminal
         self.control = control
         self.keywords = []
+
+        if room is not None:
+            room.items.append(self)
+            room.objects.append(self)
 
     def take(self):
         if self.takeable:
@@ -27,8 +31,8 @@ class Item():
 
 
 class Key(Item):
-    def __init__(self,name,description,terminal,control):
-        super().__init__(name,description,True,terminal,control)
+    def __init__(self,name,description,room,terminal,control):
+        super().__init__(name,description,True,room,terminal,control)
         self.keywords =  ["unlock","lock"]
 
     def do(self,keyword):
@@ -40,3 +44,25 @@ class Key(Item):
             for door in self.control.currentRoom.doors.values():
                 if isinstance(door,LockedDoor):
                     door.lock(self)
+
+class Healing(Item):
+    def __init__(self,room,terminal, control):
+        super().__init__("Nanobots","Mends your body",True,room,terminal, control)
+        self.keywords =  ["use"]
+
+    def do(self,keyword):
+        if keyword == "use":
+            healthIncrease = 4
+            self.control.player.hp += healthIncrease
+            self.terminal.descriptionAdd(f"You healed {healthIncrease} hitpoints.")
+
+class Note(Item):
+    def __init__(self,paperDescription,message,room,terminal, control):
+        description = f"A piece of {paperDescription}. It has words on that could be read if you pick it up."
+        super().__init__("Note",description,True,room,terminal, control)
+        self.message = message
+        self.keywords = ["read"]
+
+    def do(self,keyword):
+        if keyword == "read":
+            self.terminal.descriptionAdd(f"The note reads {self.message}.")

@@ -1,18 +1,29 @@
+from computer import Computer
 from terminal import Terminal
 import sys
+import random
 from room import Room, Area
 from door import Door, LockedDoor
 from control import Control
-from item import Item, Key
+from item import Item, Key, Note
 from character import Character, Programmer
 from player import Player
+from security import SecurityBot
 from weapon import Weapon
+from completitionCheck import CompletionCheck
 
 control = Control()
 terminal = Terminal(control)
 control.terminal = terminal
 control.commandsToActions["commands"] = terminal.toggleCommands
 control.commandsToActions["quit"] = terminal.endGame
+
+f = open("names.txt","r")
+names = list(i[:-1] for i in f.readlines())
+f.close
+
+def name():
+    return random.choice(names)
 
 # Creating Storage Room
 storageRoom = Room("Storage Room", "Piles high with random boxes and machinery parts", terminal)
@@ -29,8 +40,15 @@ storageRoomProtocol.sides = {"north": storageRoomWeapons, "west":storageRoomClea
 storageRoomCleaning.sides = {"east": storageRoomProtocol, "north": storageRoomSentries, "south": storageRoomLaborer}
 storageRoomLaborer.sides = {"east":storageRoomMessenger,"north":storageRoomCleaning}
 
+# Create outside room
+outside = Room("Outside","Away from the confines of the building, the world looks massive",terminal)
+control.completedCheck = CompletionCheck(control,terminal,outside)
+
 # Create security office
 securityOffice = Room("Security Office", "Everything looks clean and nicely tendered", terminal)
+for i in range(5):
+    SecurityBot(str(i+1),securityOffice,terminal,control)
+    
 
 # Creating Programming Room and various stations
 programmingRoom = Room("Programmers Office", "Banks of computer span this room", terminal)
@@ -41,7 +59,7 @@ for i in range(2):
         row = "1st" if (i == 0) else "2nd"
         description = f"Computer terminal in {row} row with a number {j} on the banner"
         newStation = Area("Computer Terminal",description,terminal,programmingRoom)
-        Programmer("Programmer",Weapon("Blaster","Not normally required in their line of work",3,terminal,control),newStation,terminal,control)
+        Programmer(name(),Weapon("Blaster","Not normally required in their line of work",2,terminal,control),newStation,terminal,control)
         programmingDeskRow.append(newStation)
         if i == 1:
             programmingDesks[0][j].sides["south"] = newStation
@@ -50,27 +68,40 @@ for i in range(2):
         if j > 0:
             programmingDeskRow[j-1].sides["east"] = newStation
             newStation.sides["west"] = programmingDeskRow[j-1]
+
+        password = Computer(newStation,terminal,control).getPassword()
+        Note("crisp white paper",password,newStation,terminal,control)
+        
         
     programmingDesks.append(programmingDeskRow)
     
 
 # Creating Engineering Room
 engineeringRoom = Room("Engineering Office", "In the centre there is a large worktable. Surrounded by a series of computer stations and 3D printers", terminal)
+password = Computer(engineeringRoom,terminal,control).getPassword()
+Note("yellow sticky note covered in stains",password,newStation,terminal,control)
 
 # Creating Marketting Room
 markettingRoom = Room("Marketting Office", "Just a bunch of computers and a giant colour palette poster", terminal)
+for i in range(4):
+    Character(name(),"Works on creating a positive message for the company",None,markettingRoom,terminal,control)
 
 # Creating Lunch Room
 lunchRoom = Room("Lunch Room", "There's a mini kitchenette to the west, and several tables fill the rest of the room", terminal)
 
 # Create Waiting Room
 waitingRoom = Room("Waiting Room", "Nothing to see here, just a threadbare couch", terminal)
+Character(name(),"Serves people who wish to see the CEO",None,waitingRoom,terminal,control)
+
 
 # Creating CEO's Office
 ceoOffice = Room("CEO's Office", "A luxurious room, fit for any executive", terminal)
+Item("Desk", "Dark mahogony with luxurious inlay",False,ceoOffice,terminal,control)
 
 # Creating Data Store
 dataStore = Room("Data store and super computer","A room filled with harddrives to the north and a large quantum computer to the south",terminal)
+Item("Hardrive","Holds valuable company information that will be difficult to replace", True,dataStore,terminal,control)
+Item("Quantum Computer", "Processes complicated algorithms in seconds that would take conventional computers years",False,dataStore,terminal,control)
 
 # Creating Main Corridor
 mainCorridor = Room("Main Corridor", "There is nowhere to hide", terminal)
@@ -105,7 +136,6 @@ for i in range(3):
         if j > 0:
             protocolMachinesRow[j-1].sides["east"] = newStation
             newStation.sides["west"] = protocolMachinesRow[j-1]
-        Character("A nobody","Automatic",Weapon("Fists", "THey hit",0,terminal,control),newStation,terminal,control)
         
     protocolMachines.append(protocolMachinesRow)
 
@@ -215,6 +245,15 @@ newDoor = Door("Door to Storage Room", "Old and musty, this door is rarely used"
 mainCorridorRooms[0].setDoor(newDoor,"east")
 storageRoomLaborer.setDoor(newDoor,"west")
 
+mainCorridorRooms[0].setDoor(newDoor,"east")
+storageRoomLaborer.setDoor(newDoor,"west")
+
+exitKey = Key("Orange keycard","You immediately know what this for, the door to the outside",ceoOffice,terminal,control)
+
+newDoor = LockedDoor("Door to the Outside", "A sleek silver door, it has an orange card reader",exitKey,terminal)
+mainCorridorRooms[7].setDoor(newDoor,"east")
+outside.setDoor(newDoor,"west")
+
 # Create door between security office and corridor
 newDoor = Door("Door to Security Room", "The door is constructed from metal, it would be impossible to enter when locked", terminal)
 mainCorridorRooms[11].setDoor(newDoor,"west")
@@ -255,9 +294,7 @@ waitingRoom.setDoor(newDoor,"west")
 mainCorridorRooms[16].setDoor(newDoor,"east")
 
 # Link CEO's Office to other rooms
-newKey = Key("Black Stone","A large black stone that emits a strange signal. It could unlock a door",terminal,control)
-waitingRoom.items.append(newKey)
-waitingRoom.objects.append(newKey)
+newKey = Key("Black Stone","A large black stone that emits a strange signal. It could unlock a door",waitingRoom,terminal,control)
 newDoor = LockedDoor("Mahogony Door", "Beautifully crafted, this door looks out of place with the minimalist design of the rest of the building.",newKey,terminal)
 waitingRoom.setDoor(newDoor,"south") 
 ceoOffice.setDoor(newDoor,"north")
@@ -290,9 +327,9 @@ player = Player("You are a robot",Weapon("fist","",1,terminal,control),terminal,
 
 control.player = player
 
-
 control.currentRoom = storageRoomSentries
-control.currentRoom = engineeringRoom
+Note("Data stick","This company is evil, get out and expose it",control.currentRoom,terminal,control)
+control.currentRoom = programmingDesks[0][0]
 
 terminal.descriptionAdd("WELCOME TO Game Name")
 terminal.descriptionAdd("Type 'commands' for hints or type ? at any time")
@@ -300,5 +337,5 @@ terminal.descriptionAdd("")
 terminal.descriptionAdd("")
 control.currentRoom.describe()
 
-while True:
+while not(control.completedCheck.run()):
     control.runAll()

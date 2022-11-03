@@ -106,6 +106,26 @@ class Terminal():
                     self.text += 'y'
                 elif event.key == pygame.K_z:
                     self.text += 'z'
+                elif event.key == pygame.K_1:
+                    self.text += '1'
+                elif event.key == pygame.K_2:
+                    self.text += '2'
+                elif event.key == pygame.K_3:
+                    self.text += '3'
+                elif event.key == pygame.K_4:
+                    self.text += '4'
+                elif event.key == pygame.K_5:
+                    self.text += '5'   
+                elif event.key == pygame.K_6:
+                    self.text += '6'
+                elif event.key == pygame.K_7:
+                    self.text += '7'
+                elif event.key == pygame.K_8:
+                    self.text += '8'
+                elif event.key == pygame.K_9:
+                    self.text += '9'
+                elif event.key == pygame.K_0:
+                    self.text += '0'   
                 elif event.key == pygame.K_SLASH:
                     self.text += '?'
                 elif event.key == pygame.K_SPACE:
@@ -147,13 +167,14 @@ class Terminal():
         pygame.display.flip()
 
     def descriptionAdd(self,description):
-        descriptions = []
-        while len(description)>self.maxLength:
-            descriptions.append(description[:self.maxLength])
-            description = description[self.maxLength:]
+        if self.listening:
+            descriptions = []
+            while len(description)>self.maxLength:
+                descriptions.append(description[:self.maxLength])
+                description = description[self.maxLength:]
 
-        self.previousTexts.extend(descriptions)
-        self.previousTexts.append(description)
+            self.previousTexts.extend(descriptions)
+            self.previousTexts.append(description)
 
     def toggleCommands(self,command):
         self.hints = not(self.hints)

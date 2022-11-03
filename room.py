@@ -60,11 +60,12 @@ class Area(Room):
         self.sides = {}
         self.room = room
         self.items = []
-        self.objects = room.objects
-        self.characters = room.characters
+        self.objects = []
+        self.characters = []
 
     def run(self):
-        pass
+        for thing in self.objects:
+            thing.run()
 
     def describe(self):
         self.terminal.descriptionAdd(f"You are in the {self.name} of {self.room.name}")
@@ -87,6 +88,8 @@ class Area(Room):
             for character in self.characters:
                 if character.alive:
                     characterListString += character.name + " and "
+                else:
+                    characterListString += "a dead " + character.name + " and "
             self.terminal.descriptionAdd(f"There is {characterListString[:-5]}.")
 
     def move(self, direction):

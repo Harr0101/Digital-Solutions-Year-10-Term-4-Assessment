@@ -4,7 +4,7 @@ from player import Player
 class Weapon(Item):
     def __init__(self,name,description,damage,terminal,control):
         self.damage = damage
-        super().__init__(name,description,True, terminal,control)
+        super().__init__(name,description,True, None, terminal,control)
 
     def use(self,target,user):
         target.hp -= self.damage
@@ -18,6 +18,7 @@ class Weapon(Item):
             else:
                 self.terminal.descriptionAdd(f"You killed {target.name}")
                 target.alive = False
+                self.control.completedCheck.enemies -= 1
 
 
 

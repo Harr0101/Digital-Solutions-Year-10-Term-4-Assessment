@@ -1,9 +1,0 @@
-
-ITEM; map; shows where you are; Takeable; Room1Name
-
-DOOR; OakDoor; Description; Room1Name; north; Room2Name; south
-LDOOR; LockedDoor; This door has a key hole; BronzeKey; Room1Name; east; Room3Name; west
-
-WEAPON; sword; It is very sharp; 10; Room1Name
-
-CHARACTER; Bob; A hermit who lives in the cave; Room1Name

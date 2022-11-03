@@ -16,7 +16,7 @@ class Control():
                                 "inventory":self.inventory,
                                 "setweapon":self.setWeapon}
         self.player = None
-                                
+                                       
 
     def runAll(self):
         self.terminal.run()
@@ -39,9 +39,24 @@ class Control():
         for object in self.player.inventory:
             if command.startswith(object.name.lower()):
                 keyword = command[len(object.name.lower()):].lstrip()
-                
                 if keyword in object.keywords:
                     object.do(keyword)
+                    return
+                else:
+                    self.terminal.descriptionAdd(f"The {keyword} can't do that.")
+        for object in self.currentRoom.items:
+            if command.startswith(object.name.lower()):
+                keyword = command[len(object.name.lower()):].lstrip()
+                found = False
+                for word in object.keywords:
+                    print(word)
+                    if keyword.startswith(word):
+                        found = True
+                if found:
+                    object.do(keyword)
+                    return
+                else:
+                    self.terminal.descriptionAdd(f"The {object.name} can't do that.")
                     return
         self.terminal.descriptionAdd("Not a valid command")
         self.terminal.descriptionAdd("")
@@ -108,7 +123,7 @@ class Control():
     
     def talk(self,command):
         foundPerson = False
-        person = command [1]
+        person = command[1]
         command.pop(0)
         command.pop(0)
         command = " ".join(command)
