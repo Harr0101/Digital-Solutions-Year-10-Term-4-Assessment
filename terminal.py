@@ -22,14 +22,16 @@ class Terminal():
         for i in range(23):
             self.previousTexts.append("")
         self.maxLength = 100
-        
+
+
         self.hints = False
         self.listening = True
 
         self.killClock = 300
+        self.loopsPerSecond = 30
 
     def run(self):
-        self.clock.tick(30)
+        self.clock.tick(self.loopsPerSecond)
         events = pygame.event.get()
         keys = pygame.key.get_pressed()
         self.keys(events)
@@ -154,6 +156,12 @@ class Terminal():
                 for command in self.control.commandsToActions.keys(): 
                     if command[:len(self.text)] == self.text:
                         possibleCommands.append(command)
+
+                for command in self.control.player.inventory + self.control.currentRoom.items:
+                    command = command.name
+                    if command[:len(self.text)] == self.text:
+                        possibleCommands.append(command)
+
             else:
                 possibleCommands = []
                 for command in self.control.commandsToActions.keys(): 

@@ -37,11 +37,11 @@ class Key(Item):
 
     def do(self,keyword):
         if keyword == 'unlock':
-            for door in self.control.currentRoom.doors.values():
+            for door in self.control.currentRoom.sides.values():
                 if isinstance(door,LockedDoor):
                     door.unlock(self)
         elif keyword == 'lock':
-            for door in self.control.currentRoom.doors.values():
+            for door in self.control.currentRoom.sides.values():
                 if isinstance(door,LockedDoor):
                     door.lock(self)
 
@@ -57,9 +57,9 @@ class Healing(Item):
             self.terminal.descriptionAdd(f"You healed {healthIncrease} hitpoints.")
 
 class Note(Item):
-    def __init__(self,paperDescription,message,room,terminal, control):
+    def __init__(self,paperDescription,message,room,takeable,terminal, control):
         description = f"A piece of {paperDescription}. It has words on that could be read if you pick it up."
-        super().__init__("Note",description,True,room,terminal, control)
+        super().__init__("Note",description,takeable,room,terminal, control)
         self.message = message
         self.keywords = ["read"]
 

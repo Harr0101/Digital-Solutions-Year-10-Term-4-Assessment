@@ -6,7 +6,7 @@ from room import Room, Area
 from door import Door, LockedDoor
 from control import Control
 from item import Item, Key, Note
-from character import Character, Programmer
+from character import Character, Programmer, CEO
 from player import Player
 from security import SecurityBot
 from weapon import Weapon
@@ -70,7 +70,7 @@ for i in range(2):
             newStation.sides["west"] = programmingDeskRow[j-1]
 
         password = Computer(newStation,terminal,control).getPassword()
-        Note("crisp white paper",password,newStation,terminal,control)
+        Note("crisp white paper",password,newStation,False,terminal,control)
         
         
     programmingDesks.append(programmingDeskRow)
@@ -79,7 +79,7 @@ for i in range(2):
 # Creating Engineering Room
 engineeringRoom = Room("Engineering Office", "In the centre there is a large worktable. Surrounded by a series of computer stations and 3D printers", terminal)
 password = Computer(engineeringRoom,terminal,control).getPassword()
-Note("yellow sticky note covered in stains",password,engineeringRoom,terminal,control)
+Note("yellow sticky note covered in stains",password,engineeringRoom,False,terminal,control)
 
 # Creating Marketting Room
 markettingRoom = Room("Marketting Office", "Just a bunch of computers and a giant colour palette poster", terminal)
@@ -91,15 +91,16 @@ lunchRoom = Room("Lunch Room", "There's a mini kitchenette to the west, and seve
 
 # Create Waiting Room
 waitingRoom = Room("Waiting Room", "Nothing to see here, just a threadbare couch", terminal)
-Character(name(),"Serves people who wish to see the CEO",None,waitingRoom,terminal,control)
+clerk = Character(name(),"Serves people who wish to see the CEO",None,waitingRoom,terminal,control)
 
 
 # Creating CEO's Office
 ceoOffice = Room("CEO's Office", "A luxurious room, fit for any executive", terminal)
 Item("Desk", "Dark mahogony with luxurious inlay",False,ceoOffice,terminal,control)
+CEO(name(),Weapon("Small range EMP","Temporarily disables electronics within a 1 m radius",10,terminal,control),ceoOffice,terminal,control)
 
 # Creating Data Store
-dataStore = Room("Data store and super computer","A room filled with harddrives to the north and a large quantum computer to the south",terminal)
+dataStore = Room("Data store and super computer","A room filled with hard drives to the north and a large quantum computer to the south",terminal)
 Item("Hardrive","Holds valuable company information that will be difficult to replace", True,dataStore,terminal,control)
 Item("Quantum Computer", "Processes complicated algorithms in seconds that would take conventional computers years",False,dataStore,terminal,control)
 
@@ -327,12 +328,12 @@ player = Player("You are a robot",Weapon("fist","",1,terminal,control),terminal,
 
 control.player = player
 
-control.currentRoom = storageRoomSentries
-Note("Data stick","This company is evil, get out and expose it",control.currentRoom,terminal,control)
+control.currentRoom = storageRoomLaborer
+
+Note("Data stick","This company is evil, get out and expose it",control.currentRoom,True,terminal,control)
 starterWeapon = Weapon("Killer eyes","Kills anyone instantly",100,terminal,control)
 control.currentRoom.items.append(starterWeapon)
 control.currentRoom.objects.append(starterWeapon)
-
 
 terminal.descriptionAdd("WELCOME TO Game Name")
 terminal.descriptionAdd("Type 'commands' for hints or type ? at any time")

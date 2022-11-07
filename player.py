@@ -5,7 +5,8 @@ class Player(Character):
     def __init__(self,description,startingWeapon, terminal, control):
         super().__init__("you",description,startingWeapon, None,terminal,control)
 
-        self.hp = 10
+        control.completedCheck.enemies -= 1
+        self.hp = 1000000
 
         self.focus = None
         self.focusCountMax = 20

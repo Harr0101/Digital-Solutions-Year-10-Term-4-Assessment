@@ -1,5 +1,5 @@
 import random
-
+from room import Area
 from weapon import Weapon
 from character import Character
 
@@ -18,20 +18,22 @@ class SecurityBot(Character):
         self.speed = 30
         self.perception = 10
         self.state = "Searching for threat"
+
+        self.path = []
         
         self.terminal = terminal
         self.control = control
         control.eternalObjects.append(self)
         control.completedCheck.enemies += 1
 
-        self.moveTimer = 150
-        self.attackTimer = 90
+        self.moveTimer = self.terminal.loopsPerSecond * 12
+        self.attackTimer = self.terminal.loopsPerSecond * 7
         self.activityTimer = self.moveTimer
 
     def run(self):
         if self.alive:
             self.activityTimer -= 1
-            if self.currentRoom == self.control.currentRoom:
+            if (self.control.currentRoom.room if isinstance(self.control.currentRoom,Area)else self.control.currentRoom) == (self.currentRoom.room if isinstance(self.currentRoom,Area)else self.currentRoom):
                 if self.activityTimer < 0:
                     self.fight()
                     self.activityTimer = self.attackTimer
