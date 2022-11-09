@@ -5,6 +5,42 @@ from item import Item,Healing
 from weapon import Weapon
 
 class Computer(Item):
+    """
+    A class to represent an item.
+
+    ...
+
+    Attributes
+    ----------
+    keywords : list
+        words that can be used to make the computer do something
+    state : str
+        What the computer is currently doing
+    items : dict
+        what items the computer can createc
+    homeScreenIcons: list
+        the programs on the computer
+    fileExplorerFiles : dict
+        files that the player can read on the computer
+    words : str
+        what is written in the word processor application
+    password : str
+        the password of the computer
+
+    Methods
+    -------
+    getPassword() :
+        returns computer's password
+
+    describe() :
+        adds description to terminal
+
+    run() :
+        runs computer object to determine description and keyword
+
+    do(keyword) :
+        updates computer's state based on player input
+    """
     def __init__(self,room,terminal, control):
         super().__init__("computer","Attached to the local intranet",False,room,terminal,control)
         self.keywords = []

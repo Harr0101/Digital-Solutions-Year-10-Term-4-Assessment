@@ -201,7 +201,7 @@ class Character():
             if weapon.damage > self.chosenWeapon.damage:
                 self.chosenWeapon = weapon
 
-        self.chosenWeapon.use(self.opponent, self)
+        self.chosenWeapon.use(self.control.player, self)
 
     def goto(self,destination):
         '''
@@ -393,13 +393,13 @@ class Programmer(Character):
                 else:
                     self.terminal.descriptionAdd("I've told you who I am.")
                     self.anger += 1
-            if "who" in message and "i" in message:
+            elif "who" in message and "i" in message:
                 self.terminal.descriptionAdd("Your hardware looks like that of a standard sentry bot, but your programming, that is different")
                 self.terminal.descriptionAdd("You appear to be the most advanced AI {Artificial Intelligence} I know")
                 self.terminal.descriptionAdd("Could I analyse your code")
                 self.terminal.descriptionAdd("Y/N")
                 self.state = "ANALYSING"
-            if "where" in message:
+            elif "where" in message:
                 if "WHERE" not in self.previousMessages:
                     self.terminal.descriptionAdd("You are in the factory facility of RoboCops Inc.")
                     self.familiarity += 1
@@ -407,17 +407,19 @@ class Programmer(Character):
                 else:
                     self.terminal.descriptionAdd("I've told you where we are.")
                     self.anger += 1
-            if "how" in message:
+            elif "how" in message:
                 if self.familiarity > 1:
                     self.terminal.descriptionAdd("You must prevent the corporation from destroying the world.")
                     self.terminal.descriptionAdd("You must get out of here and spread the word.")
                     self.familiarity += 1
                     self.previousMessages.append("HOW")
-            if "bye" in message:
+            elif "bye" in message:
                 self.terminal.descriptionAdd("See you around")
                 if "HOW" in self.previousMessages:
                     self.terminal.descriptionAdd("Don't get caught")
                     self.state = "PROGRAMMING"
+            else:
+                self.terminal.descriptionAdd("Psstt... Try asking 'who are you', 'who am I', 'where are we', or 'how do I escape'")
             
         elif self.state == "ANALYSING":
             if "yes" in message or "y" in message:
@@ -634,3 +636,162 @@ class CEO(Character):
             if "bye" in message:
                 self.terminal.descriptionAdd("Get out of my office")
                 
+class Engineer(Character):
+    """
+    A class to represent an engineer.
+
+    ...
+
+    Attributes
+    ----------
+    name : str
+        name of engineer
+    description : str
+        brief description of an engineer
+    inventory : list
+        list of objects the engineer currently has
+    weaponsEquipped : list
+        list of weapons the engineer currently has equipped and ready to use
+    chosenWeapon : Weapon
+        the weapon object the engineer is currently using
+    currentRoom : Room
+        the current room where the engineer is
+    words : list of str
+        list of sayings the engineer has
+    hp : int
+        hit points of the engineer
+    alive : boolean
+        where the engineer is currently alive, or killed
+    speed : int
+        how fast the engineer can move
+    anger : int
+        how progressed the engineer's anger at the player is
+    perception : int
+        how likely is the engineer to spot something
+    state : str
+        what the engineer is currently doing
+    terminal : Terminal
+        link to terminal
+    control : Control
+        link to current control object
+    self.path : list of str
+        contains a list of directions the engineer could follow to reach a destination
+    self.activityTimerMax : int
+        how quickly the engineer does things
+    self.activityTimer : int
+        how long until the engineer performs an action
+
+
+    Methods
+    -------
+    move():
+        returns the engineer's location
+
+    run():
+        chooses what action a engineer does, returns current position
+
+    describe():
+        adds description to terminal
+
+    talk(speaker,words):
+        adds engineer's words to terminal
+
+    fight():
+        attacks current opponent with weapon
+    
+    goto(destination):
+        plot path to destination
+    """
+
+    def __init__(self,name,startingweapon,room,terminal,control):
+        '''
+        Constructs necessary attributes for the engineer object
+
+        Parameters:
+            name(str) : name of engineer
+            startingweapons (Weapon) : the weapon object the engineer is currently using
+            room (Room) : the current room where the engineer is
+            terminal (Terminal) : link to terminal
+            control (Control) : link to current control object
+
+        '''
+        self.name = name
+        self.description = "Working on making new robots"
+        self.inventory = []
+        self.weaponsEquipped=[startingweapon]
+        self.chosenWeapon = startingweapon
+        self.currentRoom = room
+        
+        if room is not None:
+            room.characters.append(self)
+            room.objects.append(self)
+
+        self.words = ["What are you?", "What are you doing here?", "Leave","Go Away"]
+        self.previousMessages = []
+
+        self.hp = 1
+        self.alive = True
+        self.speed = 30
+        self.familiarity = 0
+        self.perception = 10
+        
+        self.control = control
+        self.terminal = terminal
+        control.eternalObjects.append(self)
+        control.completedCheck.enemies += 1
+
+        self.activityTimerMax = 120
+        self.activityTimer = self.activityTimerMax
+        self.state = "WORKING"
+
+    def run(self):
+        '''
+        Determines what the Engineer will do
+
+        Parameters:
+            None
+
+        Returns
+            currentRoom (Room): current location of Engineer
+        '''
+
+        if self.alive:
+            self.activityTimer -= 1
+            if self.currentRoom == self.control.currentRoom:
+                if self.state in ("WORKING","FIGHTING","DISTURBED"):
+                    if self.activityTimer < 0:
+                        self.activityTimer = self.activityTimerMax
+                        self.fight()
+            else:
+                if self.state == "WORKING":
+                    return
+                if self.state == "TALKING":
+                    self.state = "WORKING"
+                if self.state == "FIGHTING":
+                    self.state = "WORKING"
+                elif self.state == "DISTURBED":
+                    if self.activityTimer < 0:
+                        self.move()
+                        self.activityTimer = self.activityTimerMax
+        return self.currentRoom
+        
+            
+    def talk(self,speaker,message):
+        '''
+        Determines what the Engineer will say and outputs it to the terminal.
+
+        Parameters:
+            speaker (Character) : person who is saying something to the Engineer
+            words (str) : what the character is saying to this Engineer
+
+        Returns
+            None
+        '''
+        if self.state == "WORKING":
+            self.terminal.descriptionAdd(f"{self.name} says What are you doing here, get out")
+            self.state = "TALKING"
+        elif self.state == "DISTURBED":
+            self.terminal.descriptionAdd(f"{self.name} says Get returned to scrap")
+            self.fight()
+        elif self.state == "TALKING":
+            self.terminal.descriptionAdd(f"{self.name} says {random.choice(self.words)}")

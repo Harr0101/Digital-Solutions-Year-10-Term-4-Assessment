@@ -1,3 +1,4 @@
+#DOCSTRINGS DONE
 from computer import Computer
 from terminal import Terminal
 import sys
@@ -6,7 +7,7 @@ from room import Room, Area
 from door import Door, LockedDoor
 from control import Control
 from item import Item, Key, Note
-from character import Character, Programmer, CEO
+from character import Character, Programmer, CEO, Engineer
 from player import Player
 from security import SecurityBot
 from weapon import Weapon
@@ -23,7 +24,10 @@ names = list(i[:-1] for i in f.readlines())
 f.close
 
 def name():
+    ''' Returns random name from preloaded list of names'''
     return random.choice(names)
+
+# Creating rooms
 
 # Creating Storage Room
 storageRoom = Room("Storage Room", "Piles high with random boxes and machinery parts", terminal)
@@ -78,6 +82,8 @@ for i in range(2):
 
 # Creating Engineering Room
 engineeringRoom = Room("Engineering Office", "In the centre there is a large worktable. Surrounded by a series of computer stations and 3D printers", terminal)
+for i in range(4):
+    Engineer(name(),Weapon("Wrench","Normally used for undoing nuts",2,terminal,control),engineeringRoom,terminal,control)
 password = Computer(engineeringRoom,terminal,control).getPassword()
 Note("yellow sticky note covered in stains",password,engineeringRoom,False,terminal,control)
 

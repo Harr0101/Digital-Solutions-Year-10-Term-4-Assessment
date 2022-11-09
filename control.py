@@ -88,36 +88,39 @@ class Control():
 
     def command(self,command):
         """ Converts a text based command into an action directed at the relevant object reference """
-        if command == "":
-            return
-        command = command.lstrip().split()
-        if command[0] in self.commandsToActions.keys():
-            self.commandsToActions[command[0]](command)
-            return
-        command = " ".join(command)
-        for object in self.player.inventory:
-            if command.startswith(object.name.lower()):
-                keyword = command[len(object.name.lower()):].lstrip()
-                if keyword in object.keywords:
-                    object.do(keyword)
-                    return
-                else:
-                    self.terminal.descriptionAdd(f"The {object.name.lower()} can't do that.")
-        for object in self.currentRoom.items:
-            if command.startswith(object.name.lower()):
-                keyword = command[len(object.name.lower()):].lstrip()
-                found = False
-                for word in object.keywords:
-                    if keyword.startswith(word):
-                        found = True
-                if found:
-                    object.do(keyword)
-                    return
-                else:
-                    self.terminal.descriptionAdd(f"The {object.name} can't do that.")
-                    return
-        self.terminal.descriptionAdd("Not a valid command")
-        self.terminal.descriptionAdd("")
+        try:
+            if command == "":
+                return
+            command = command.lstrip().split()
+            if command[0] in self.commandsToActions.keys():
+                self.commandsToActions[command[0]](command)
+                return
+            command = " ".join(command)
+            for object in self.player.inventory:
+                if command.startswith(object.name.lower()):
+                    keyword = command[len(object.name.lower()):].lstrip()
+                    if keyword in object.keywords:
+                        object.do(keyword)
+                        return
+                    else:
+                        self.terminal.descriptionAdd(f"The {object.name.lower()} can't do that.")
+            for object in self.currentRoom.items:
+                if command.startswith(object.name.lower()):
+                    keyword = command[len(object.name.lower()):].lstrip()
+                    found = False
+                    for word in object.keywords:
+                        if keyword.startswith(word):
+                            found = True
+                    if found:
+                        object.do(keyword)
+                        return
+                    else:
+                        self.terminal.descriptionAdd(f"The {object.name} can't do that.")
+                        return
+            self.terminal.descriptionAdd("Not a valid command")
+            self.terminal.descriptionAdd("")
+        except:
+            pass
     
     def move(self,command):
         """ Calls room to move player and adds new room description to terminal """
