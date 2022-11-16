@@ -28,6 +28,9 @@ class Room():
     pathFindingDirection : str
         which direction a character needs to move in to get to the right location
 
+    forHumans : bool
+        if a room is designed for human use
+
     Methods
     -------
     run():
@@ -49,13 +52,14 @@ class Room():
 
     rooms = []
 
-    def __init__(self,name,description,terminal):
+    def __init__(self,name,description,forHumans,terminal):
         '''
         Constructs necessary attributes for the room object
 
         Parameters:
             name(str) : name of room
             description (str) : brief description of the room
+            forHumans (bool) : if the room is designed for human use
             terminal (Terminal) : link to terminal
 
         '''
@@ -66,6 +70,7 @@ class Room():
         self.items = []
         self.objects = []
         self.characters = []
+        self.forHumans = forHumans
         Room.rooms.append(self)
 
         self.pathFindingCounter = 9999
@@ -84,7 +89,7 @@ class Room():
         States what doors are in the room
         states what charcters are in the room if any
         """
-        self.terminal.descriptionAdd(f"You are in the {self.name}")
+        self.terminal.descriptionAdd(f"You are in the {self.name}","bold")
         self.terminal.descriptionAdd(self.description)
         if self.items:
             itemListString = ""
@@ -238,11 +243,12 @@ class Area(Room):
         Parameters:
             name(str) : name of room
             description (str) : brief description of the room
+            forHumans (bool) : if the room was designed for human use
             terminal (Terminal) : link to terminal
             room (Room) : main room of which this object is a sub room
 
         '''
-        super().__init__(name,description,terminal)
+        super().__init__(name,description,room.forHumans,terminal)
         self.room = room
         self.objects = room.objects
 
@@ -253,7 +259,7 @@ class Area(Room):
         States what doors are in the room
         states what charcters are in the room if any
         """
-        self.terminal.descriptionAdd(f"You are in the {self.name} of {self.room.name}")
+        self.terminal.descriptionAdd(f"You are in the {self.name} of {self.room.name}","bold")
         self.terminal.descriptionAdd(self.room.description)
         self.terminal.descriptionAdd(self.description)
         if self.items:

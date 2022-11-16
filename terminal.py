@@ -74,10 +74,12 @@ class Terminal():
         #Sets up screen
         self.screenSize = (800,500)
         self.win = pygame.display.set_mode(self.screenSize)
-        pygame.display.set_caption("Terminal")
+        pygame.display.set_caption("EscapeTech")
         self.clock = pygame.time.Clock()
 
         self.font = pygame.font.SysFont("TimesNewRoman",18)
+        self.boldFont = pygame.font.SysFont("TimesNewRoman",18,True)
+        self.italicsFont = pygame.font.SysFont("TimesNewRoman",18,False,True)
         self.text = ""
         self.cursor = "|"
         self.cursorOn = True
@@ -85,7 +87,7 @@ class Terminal():
         self.cursorTimer = self.cursorTimerMax
         self.previousTexts = []
         for i in range(23):
-            self.previousTexts.append("")
+            self.previousTexts.append(("","normal"))
         self.maxLength = 100
 
 
@@ -220,11 +222,12 @@ class Terminal():
                 elif event.key == pygame.K_BACKSPACE:
                     self.text=self.text[:-1]
                 elif event.key == pygame.K_RETURN:
-                    self.previousTexts.append(self.text)
+                    self.previousTexts.append((self.text,"italics"))
                     self.control.command(self.text)
                     self.text = ""
                 elif event.key == pygame.K_TAB:
-                    self.text = self.possibleCommands[0]
+                    if self.possibleCommands:
+                        self.text = self.possibleCommands[0]
 
     def draw(self):
         ''' Updates terminal window '''
@@ -233,7 +236,13 @@ class Terminal():
         
         # Previous texts
         for i in range(len(self.previousTexts)):
-            textPic = self.font.render(self.previousTexts[i], 1, (150,255,150))
+            line = self.previousTexts[i]
+            if line[1] == "bold":
+                textPic = self.boldFont.render(line[0], 1, (150,255,150))
+            elif line[1] == "italics":
+                textPic = self.italicsFont.render(line[0], 1, (150,255,150))
+            else:
+                textPic = self.font.render(line[0], 1, (150,255,150))
             self.win.blit(textPic,(0,20*i+10))
         
         # Current command
@@ -270,7 +279,7 @@ class Terminal():
 
         pygame.display.flip()
 
-    def descriptionAdd(self,description):
+    def descriptionAdd(self,description,formatting = "normal"):
         '''
         Adds text to previously texts to be displayed on the terminal
 
@@ -286,8 +295,9 @@ class Terminal():
                 descriptions.append(description[:self.maxLength])
                 description = description[self.maxLength:]
 
-            self.previousTexts.extend(descriptions)
-            self.previousTexts.append(description)
+            for line in descriptions:
+                self.previousTexts.append((line,formatting))
+            self.previousTexts.append((description,formatting))
 
     def toggleCommands(self,command):
         ''' Toggle showing commands '''

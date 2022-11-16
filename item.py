@@ -235,3 +235,90 @@ class Note(Item):
         '''
         if keyword == "read":
             self.terminal.descriptionAdd(f"The note reads {self.message}.")
+
+class DormantRobot(Item):
+    """
+    A class to represent a robot that the player can take control of
+
+    ...
+
+    Attributes
+    ----------
+    type : dict
+        what type of robot it is
+
+
+    Methods
+    -------
+    describe():
+        outputs message to terminal
+
+    """
+
+    def __init__(self,room,terminal, control,type):
+        '''
+        Constructs necessary attributes for the key object
+
+        Parameters:
+            terminal (Terminal) : link to terminal
+            control (Control) : link to current control object
+        '''
+        super().__init__("Robot","Standing unused in a corner",False,room,terminal, control)
+        self.type = type.copy()
+
+
+    def describe(self):
+        ''' Outputs description to terminal '''
+        type = self.type["Name"]
+        description = self.type["Description"]
+        self.terminal.descriptionAdd(f"It is a {type} robot, standing unused. It is {description}")
+
+class PlayerCharacterChanger(Item):
+    """
+    A class to represent an item that changes attributes of the player
+
+    ...
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+    do(keyword):
+        outputs message to terminal
+
+    """
+
+    def __init__(self,room,terminal, control):
+        '''
+        Constructs necessary attributes for the key object
+
+        Parameters:
+            terminal (Terminal) : link to terminal
+            control (Control) : link to current control object
+        '''
+        super().__init__("Cord","Hijacks other robots",True,room,terminal, control)
+        self.keywords =  ["use"]
+
+    def do(self,keyword):
+        '''
+        Increases health of player by specified amount
+
+        Parameters:
+            keyword (str) : what was typed in the terminal to activate the item
+
+        Returns
+            None
+        '''
+        if keyword == "use":
+            for object in self.control.currentRoom.items:
+                if isinstance(object,DormantRobot):
+                    robot = self.control.player.mechanics.copy()
+                    self.control.player.mechanics = object.type.copy()
+                    object.type = robot
+
+                    type = self.control.player.mechanics["Name"]
+                    self.terminal.descriptionAdd(f"You are now a {type}.")
+
+            
+            

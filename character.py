@@ -1,7 +1,7 @@
 #DOCSTRINGS DONE
 import random
 
-from item import Item
+from item import PlayerCharacterChanger
 from room import Room
 
 class Character():
@@ -175,7 +175,7 @@ class Character():
         ''' Outputs description to terminal '''
         self.terminal.descriptionAdd(self.description)
         if not(self.alive):
-            self.terminal.descriptionAdd("He is dead")
+            self.terminal.descriptionAdd("They are dead")
 
     def talk(self,speaker,words):
         '''
@@ -425,7 +425,7 @@ class Programmer(Character):
             if "yes" in message or "y" in message:
                 self.terminal.descriptionAdd(f"{self.name} plugs a cord into you and the other end to his computer.")
                 self.terminal.descriptionAdd("Thanks, I'll give you this cord so you can transfer or copy your code if you want a new body")
-                cord = Item("Transfer Cord","Used to transfer code from one robot to another",True,self.terminal,self.control)
+                cord = PlayerCharacterChanger("Transfer Cord","Used to transfer code from one robot to another",True,self.terminal,self.control)
                 cord.take()
                 self.control.player.inventory.append(cord)
                 self.state = "PRGRAMMING"

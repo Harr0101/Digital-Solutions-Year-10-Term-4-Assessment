@@ -105,11 +105,26 @@ class SecurityBot(Character):
         if self.alive:
             self.activityTimer -= 1
             if (self.control.currentRoom == self.currentRoom):
+                if self.control.currentRoom.forHumans:
+                    if self.control.player.mechanics["Presence in Human Area"]:
+                        action = "move"
+                    else:
+                        action = "fight"
+                else:
+                    if self.control.player.mechanics["Presence in Robot Area"]:
+                        action = "move"
+                    else:
+                        action = "fight"
+            else:
+                action = "move"
+            
+            if action == "fight":
                 if self.activityTimer < 0:
                     self.fight()
                     self.activityTimer = self.attackTimer
                     self.state = "Eliminating threat"
-            else:
+            
+            if action == "move":
                 if self.activityTimer < 0:
                     self.move()
                     self.activityTimer = self.moveTimer

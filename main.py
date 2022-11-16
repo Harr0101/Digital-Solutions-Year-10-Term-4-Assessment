@@ -6,12 +6,14 @@ import random
 from room import Room, Area
 from door import Door, LockedDoor
 from control import Control
-from item import Item, Key, Note
+from item import Item, Key, Note, DormantRobot, PlayerCharacterChanger
 from character import Character, Programmer, CEO, Engineer
 from player import Player
 from security import SecurityBot
 from weapon import Weapon
 from completitionCheck import CompletionCheck
+
+import robots
 
 control = Control()
 terminal = Terminal(control)
@@ -30,13 +32,18 @@ def name():
 # Creating rooms
 
 # Creating Storage Room
-storageRoom = Room("Storage Room", "Piles high with random boxes and machinery parts", terminal)
+storageRoom = Room("Storage Room", "There are piles high with boxes of different sizes and machinery parts",False, terminal)
 storageRoomMessenger = Area("Messenger Storage", "The shelves here are filled with small bots designed to deliver messages",terminal,storageRoom)
-storageRoomWeapons = Area("Weapons Storage", "The shelves here are filled with machinery designed to kill and destroy",terminal,storageRoom)
+#DormantRobot(storageRoomMessenger,terminal,control,robots.messenger)
+storageRoomWeapons = Area("Weapons Storage", "The shelves here are filled with machinery designed to kill or destroy",terminal,storageRoom)
 storageRoomSentries = Area("Sentries Storage", "There are rows of blank guard robots",terminal,storageRoom)
+DormantRobot(storageRoomSentries,terminal,control,robots.sentry)
 storageRoomProtocol = Area("Protocol Storage", "There are rows of robots in the appearance of humans, created to help and assist",terminal,storageRoom)
-storageRoomCleaning = Area("Cleaning Storage","The robots here remove dirt, grime, and the stuff no one talks about", terminal,storageRoom)
+DormantRobot(storageRoomProtocol,terminal,control,robots.protocol)
+storageRoomCleaning = Area("Cleaning Storage","The robots here remove dirt, grime, and dust", terminal,storageRoom)
+DormantRobot(storageRoomCleaning,terminal,control,robots.cleaning)
 storageRoomLaborer = Area("Laborer Storage", "There are rows of robots designed to do heavy lifting and moving",terminal,storageRoom)
+DormantRobot(storageRoomLaborer,terminal,control,robots.laborer)
 storageRoomMessenger.sides = {"north":storageRoomProtocol, "west": storageRoomLaborer}
 storageRoomWeapons.sides = {"west": storageRoomSentries, "south": storageRoomProtocol}
 storageRoomSentries.sides = {"east": storageRoomWeapons,"south":storageRoomCleaning}
@@ -45,29 +52,29 @@ storageRoomCleaning.sides = {"east": storageRoomProtocol, "north": storageRoomSe
 storageRoomLaborer.sides = {"east":storageRoomMessenger,"north":storageRoomCleaning}
 
 # Create outside room
-outside = Room("Outside","Away from the confines of the building, the world looks massive",terminal)
+outside = Room("Outside","Away from the confines of the building, the world looks massive",True,terminal)
 control.completedCheck = CompletionCheck(control,terminal,outside)
 
 # Create security office
-securityOffice = Room("Security Office", "Everything looks clean and nicely tendered", terminal)
+securityOffice = Room("Security Office", "Everything looks clean and nicely tendered",True, terminal)
 for i in range(5):
     SecurityBot(str(i+1),securityOffice,terminal,control)
     
 
 # Creating Programming Room and various stations
-programmingRoom = Room("Programmers Office", "Banks of computer span this room", terminal)
+programmingRoom = Room("Programmers Office", "Banks of computers span this room arranged in 2 rows of 5", True,terminal)
 programmingDesks = []
 for i in range(2):
     programmingDeskRow = []
     for j in range(5):
         row = "1st" if (i == 0) else "2nd"
-        description = f"Computer terminal in {row} row with a number {j} on the banner"
+        description = f"Computer terminal in {row} row with a number {j+1} on the banner"
         newStation = Area("Computer Terminal",description,terminal,programmingRoom)
         Programmer(name(),Weapon("Blaster","Not normally required in their line of work",2,terminal,control),newStation,terminal,control)
         programmingDeskRow.append(newStation)
-        if i == 1:
-            programmingDesks[0][j].sides["south"] = newStation
-            newStation.sides["north"] = programmingDesks[0][j]
+        if i >0:
+            programmingDesks[i-1][j].sides["south"] = newStation
+            newStation.sides["north"] = programmingDesks[i-1][j]
 
         if j > 0:
             programmingDeskRow[j-1].sides["east"] = newStation
@@ -81,41 +88,41 @@ for i in range(2):
     
 
 # Creating Engineering Room
-engineeringRoom = Room("Engineering Office", "In the centre there is a large worktable. Surrounded by a series of computer stations and 3D printers", terminal)
+engineeringRoom = Room("Engineering Office", "The walls are occupied by a series of computer stations and 3D printers, in the centre there is a large worktable", True,terminal)
 for i in range(4):
     Engineer(name(),Weapon("Wrench","Normally used for undoing nuts",2,terminal,control),engineeringRoom,terminal,control)
 password = Computer(engineeringRoom,terminal,control).getPassword()
 Note("yellow sticky note covered in stains",password,engineeringRoom,False,terminal,control)
 
 # Creating Marketting Room
-markettingRoom = Room("Marketting Office", "Just a bunch of computers and a giant colour palette poster", terminal)
+markettingRoom = Room("Marketting Office", "Just a bunch of computers and a giant colour palette poster", True,terminal)
 for i in range(4):
-    Character(name(),"Works on creating a positive message for the company",None,markettingRoom,terminal,control)
+    Character(name(),"Works on creating a positive public image",None,markettingRoom,terminal,control)
 
 # Creating Lunch Room
-lunchRoom = Room("Lunch Room", "There's a mini kitchenette to the west, and several tables fill the rest of the room", terminal)
+lunchRoom = Room("Lunch Room", "There's a mini kitchenette to the east, and several tables fill the rest of the room", True,terminal)
 
 # Create Waiting Room
-waitingRoom = Room("Waiting Room", "Nothing to see here, just a threadbare couch", terminal)
+waitingRoom = Room("Waiting Room", "Nothing to see here, just a threadbare couch", True,terminal)
 clerk = Character(name(),"Serves people who wish to see the CEO",None,waitingRoom,terminal,control)
 
 
 # Creating CEO's Office
-ceoOffice = Room("CEO's Office", "A luxurious room, fit for any executive", terminal)
+ceoOffice = Room("CEO's Office", "A luxurious room, fit for a king", True, terminal)
 Item("Desk", "Dark mahogony with luxurious inlay",False,ceoOffice,terminal,control)
 CEO(name(),Weapon("Small range EMP","Temporarily disables electronics within a 1 m radius",10,terminal,control),ceoOffice,terminal,control)
 
 # Creating Data Store
-dataStore = Room("Data store and super computer","A room filled with hard drives to the north and a large quantum computer to the south",terminal)
-Item("Hardrive","Holds valuable company information that will be difficult to replace", True,dataStore,terminal,control)
+dataStore = Room("Data store and super computer","A room filled with whiring hard drives to the north and a large quantum computer to the south", True,terminal)
+Item("Hardrive","Holds valuable company information that would be difficult to replace", True,dataStore,terminal,control)
 Item("Quantum Computer", "Processes complicated algorithms in seconds that would take conventional computers years",False,dataStore,terminal,control)
 
 # Creating Main Corridor
-mainCorridor = Room("Main Corridor", "There is nowhere to hide", terminal)
+mainCorridor = Room("Main Corridor", "There is nowhere to hide",True, terminal)
 
 mainCorridorRooms = []
 for i in range(17):
-    newArea = Area("Main Corridor","Blank",terminal,mainCorridor)
+    newArea = Area("Main Corridor","The floors are white, as are the walls",terminal,mainCorridor)
     mainCorridorRooms.append(newArea)
     if i != 0:
         if i<12:
@@ -128,7 +135,7 @@ for i in range(17):
 
 # Creating factory space
 # creating Protocol Manufacturing
-protocolManu = Room("Protocol Manufacturing", "A factory filled with a multitude of machines, all connected", terminal)
+protocolManu = Room("Protocol Manufacturing", "A factory filled with a multitude of machines, all connected",False, terminal)
 protocolMachines = []
 for i in range(3):
     protocolMachinesRow = []
@@ -147,7 +154,7 @@ for i in range(3):
     protocolMachines.append(protocolMachinesRow)
 
 # Creating Laborer Manufacturing
-laborerManu = Room("Laborer Manufacturing", "A factory filled with a multitude of machines, all connected", terminal)
+laborerManu = Room("Laborer Manufacturing", "A factory filled with a multitude of machines, all connected", False,terminal)
 laborerMachines = []
 for i in range(3):
     laborerMachinesRow = []
@@ -165,7 +172,7 @@ for i in range(3):
     laborerMachines.append(laborerMachinesRow)
 
 # Creating Cleaner Manufacturing
-cleanerManu = Room("Cleaner Manufacturing", "A factory filled with a multitude of machines, all connected", terminal)
+cleanerManu = Room("Cleaner Manufacturing", "A factory filled with a multitude of machines, all connected", False,terminal)
 cleanerMachines = []
 for i in range(3):
     cleanerMachinesRow = []
@@ -183,7 +190,7 @@ for i in range(3):
     cleanerMachines.append(cleanerMachinesRow)
 
 # Creating Messenger Manufacturing
-messengerManu = Room("Messenger Manufacturing", "A factory filled with a multitude of machines, all connected", terminal)
+messengerManu = Room("Messenger Manufacturing", "A factory filled with a multitude of machines, all connected", False,terminal)
 messengerMachines = []
 for i in range(3):
     messengerMachinesRow = []
@@ -201,7 +208,7 @@ for i in range(3):
     messengerMachines.append(messengerMachinesRow)
 
 # Creating Sentry Manufacturing
-sentryManu = Room("Sentry Manufacturing", "A factory filled with a multitude of machines, all connected", terminal)
+sentryManu = Room("Sentry Manufacturing", "A factory filled with a multitude of machines, all connected", False, terminal)
 sentryMachines = []
 for i in range(3):
     sentryMachinesRow = []
@@ -219,7 +226,7 @@ for i in range(3):
     sentryMachines.append(sentryMachinesRow)
 
 # Creating Weapons Manufacturing
-weaponsManu = Room("Weapons Manufacturing", "A factory filled with a multitude of machines, all connected", terminal)
+weaponsManu = Room("Weapons Manufacturing", "A factory filled with a multitude of machines, all connected", False, terminal)
 weaponsMachines = []
 for i in range(3):
     weaponsMachinesRow = []
@@ -236,12 +243,12 @@ for i in range(3):
             newStation.sides["west"] = weaponsMachinesRow[j-1]
     weaponsMachines.append(weaponsMachinesRow)
 
-# Create Weapons corridor 
-manuCorridor = Room("Manufacturing Corridor", "There are no people here, only robots", terminal)
+# Create manufacturing corridor 
+manuCorridor = Room("Manufacturing Corridor", "There are no people here, only robots", False, terminal)
 
 manuCorridorRooms = []
 for i in range(9):
-    newArea = Area("Manufacturing Corridor","Blank",terminal,manuCorridor)
+    newArea = Area("Manufacturing Corridor","There are grey floors and a slightly darker gery for the walls",terminal,manuCorridor)
     manuCorridorRooms.append(newArea)
     if i != 0:
         newArea.sides["north"] = manuCorridorRooms[i-1]
@@ -262,16 +269,16 @@ mainCorridorRooms[7].setDoor(newDoor,"east")
 outside.setDoor(newDoor,"west")
 
 # Create door between security office and corridor
-newDoor = Door("Door to Security Room", "The door is constructed from metal, it would be impossible to enter when locked", terminal)
+newDoor = Door("Door to Security Room", "The door is constructed from metal, it would be impossible to enter when locked, even if you could fit a tank in the corridor", terminal)
 mainCorridorRooms[11].setDoor(newDoor,"west")
 securityOffice.setDoor(newDoor,"east")
 
 # Create doors between programming room and corridor
-newDoor = Door("Clear Door", "The door is constructed from bullet proof glass", terminal)
+newDoor = Door("Clear Door", "The door is constructed from glass", terminal)
 mainCorridorRooms[12].setDoor(newDoor,"north")
 programmingDesks[1][0].setDoor(newDoor,"south")
 
-newDoor = Door("Clear Door", "The door is constructed from bullet proof glass", terminal)
+newDoor = Door("Clear Door", "The door is constructed from glass", terminal)
 mainCorridorRooms[16].setDoor(newDoor,"north")
 programmingDesks[1][4].setDoor(newDoor,"south")
 
@@ -302,11 +309,11 @@ mainCorridorRooms[16].setDoor(newDoor,"east")
 
 # Link CEO's Office to other rooms
 newKey = Key("Black Stone","A large black stone that emits a strange signal. It could unlock a door",waitingRoom,terminal,control)
-newDoor = LockedDoor("Mahogony Door", "Beautifully crafted, this door looks out of place with the minimalist design of the rest of the building.",newKey,terminal)
+newDoor = LockedDoor("Mahogony Door", "Beautifully crafted, this door looks out of place with the minimalist design of the rest of the building",newKey,terminal)
 waitingRoom.setDoor(newDoor,"south") 
 ceoOffice.setDoor(newDoor,"north")
 
-newDoor = LockedDoor("Sliding Panel", "This door is carefully concealed from human sight.",newKey,terminal)
+newDoor = LockedDoor("Sliding Panel", "This door is carefully concealed from human sight",newKey,terminal)
 lunchRoom.setDoor(newDoor,"west") 
 ceoOffice.setDoor(newDoor,"east")
 
@@ -325,7 +332,7 @@ manuCorridorRooms[4].sides["east"] = sentryMachines[1][2]
 weaponsMachines[1][2].sides["west"] = manuCorridorRooms[7]
 manuCorridorRooms[7].sides["east"] = weaponsMachines[1][2]
 
-newDoor = Door("Portal","You can't see anything through it.", terminal)
+newDoor = Door("Portal","You can't see anything through the black swirls", terminal)
 manuCorridorRooms[8].setDoor(newDoor,"south")
 engineeringRoom.setDoor(newDoor,"south")
 
@@ -336,16 +343,19 @@ control.player = player
 
 control.currentRoom = storageRoomLaborer
 
-Note("Data stick","This company is evil, get out and expose it",control.currentRoom,True,terminal,control)
-starterWeapon = Weapon("Killer eyes","Kills anyone instantly",100,terminal,control)
+Note("yellow post-it note","This company is evil, get out and expose it!",control.currentRoom,True,terminal,control)
+starterWeapon = Weapon("Plasma blade","The handle is roughly 10cm long, but the blade is 40cm when activated",2,terminal,control)
 control.currentRoom.items.append(starterWeapon)
 control.currentRoom.objects.append(starterWeapon)
 
-terminal.descriptionAdd("WELCOME TO Game Name")
+terminal.descriptionAdd("WELCOME TO EscapeTech","bold")
 terminal.descriptionAdd("Type 'commands' for hints or type ? at any time")
 terminal.descriptionAdd("")
 terminal.descriptionAdd("")
 control.currentRoom.describe()
 
-while not(control.completedCheck.run()):
-    control.runAll()
+try:
+    while not(control.completedCheck.run()):
+        control.runAll()
+finally:
+    pass

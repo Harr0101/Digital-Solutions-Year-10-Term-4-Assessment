@@ -48,9 +48,9 @@ class Computer(Item):
         self.items = {"sword":(lambda :Weapon("Sword","Cuts",4,room,terminal,control)),"blaster":(lambda: Weapon("Blaster","Shoots stuff with pure energy",2,room,terminal,control)),"nanobots":(lambda: Healing(room,terminal,control))}
 
         self.homeScreenIcons = ["file explorer","word processor", "manufacturing control"]
-        manufacturingHints = ["Go to manufacturing application", "Choose what is made", "Visit relevant muanufacturing room ro pick up item."]
-        masterPlan = ["We will kill half the world population, and remove power facilities.","This will be started in 1 day."]
-        self.fileExplorerFiles = {"master plan":masterPlan,"manufacturing":manufacturingHints}
+        manufacturingHints = ["Go to manufacturing application", "Choose what is made", "Visit relevant muanufacturing room to pick up item."]
+        masterPlan = ["RoboCops Mission", "We aim to provide high quality robots to all people", "We aim to remove competition through the destruction of facilities","We aim to create demand through subtly destroying key instrastructure"]
+        self.fileExplorerFiles = {"Mission Statement":masterPlan,"manufacturing":manufacturingHints}
 
         self.words = ""
         self.password = ''.join(random.choice(string.ascii_lowercase) for i in range(5))

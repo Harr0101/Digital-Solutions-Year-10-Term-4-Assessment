@@ -1,5 +1,6 @@
 #DOCSTRINGS DONE
 from character import Character
+from robots import *
 
 
 class Player(Character):
@@ -14,6 +15,8 @@ class Player(Character):
         hit points that the player currently has
     focus : Object
         what the player is currently looking at that will be described repeatedly
+    mechanics : dictionary
+        what type of robot the player is currently inhabiting
     control : Control
         link to current control object
 
@@ -41,6 +44,7 @@ class Player(Character):
 
         control.completedCheck.enemies -= 1
         self.hp = 1000000
+        self.mechanics = sentry
 
         self.focus = None
         self.focusCountMax = 20
@@ -66,7 +70,11 @@ class Player(Character):
                 self.focusCount = self.focusCountMax
         return self.control.currentRoom
 
-        
+    def describe(self):
+        """ Adds description to terminal """
+        type = self.mechanics["Name"]
+        self.terminal.descriptionAdd(f"You are a {type}")
+
     def fight(self, opponent):
         ''' Attacks opponent with weapon '''
         if opponent != self:

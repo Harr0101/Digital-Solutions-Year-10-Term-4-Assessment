@@ -116,6 +116,12 @@ class Control():
                         return
                     else:
                         self.terminal.descriptionAdd(f"The {object.name} can't do that.")
+                        if object.keywords:
+                            commands = "".join(i+", " for i in object.keywords)
+                        else:
+                            commands = "do nothing  "
+                        
+                        self.terminal.descriptionAdd(f"It can {commands[:-2]}")
                         return
             self.terminal.descriptionAdd("Not a valid command")
             self.terminal.descriptionAdd("")
