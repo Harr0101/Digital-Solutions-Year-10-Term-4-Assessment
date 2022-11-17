@@ -1,4 +1,3 @@
-#DOCSTRINGS DONE
 import random
 
 from item import PlayerCharacterChanger
@@ -394,7 +393,8 @@ class Programmer(Character):
                     self.terminal.descriptionAdd("I've told you who I am.")
                     self.anger += 1
             elif "who" in message and "i" in message:
-                self.terminal.descriptionAdd("Your hardware looks like that of a standard sentry bot, but your programming, that is different")
+                type = self.control.player.mechanics["Name"].lower()
+                self.terminal.descriptionAdd(f"Your hardware looks like that of a standard {type}, but your programming, that is different")
                 self.terminal.descriptionAdd("You appear to be the most advanced AI {Artificial Intelligence} I know")
                 self.terminal.descriptionAdd("Could I analyse your code")
                 self.terminal.descriptionAdd("Y/N")
@@ -425,7 +425,7 @@ class Programmer(Character):
             if "yes" in message or "y" in message:
                 self.terminal.descriptionAdd(f"{self.name} plugs a cord into you and the other end to his computer.")
                 self.terminal.descriptionAdd("Thanks, I'll give you this cord so you can transfer or copy your code if you want a new body")
-                cord = PlayerCharacterChanger("Transfer Cord","Used to transfer code from one robot to another",True,self.terminal,self.control)
+                cord = PlayerCharacterChanger(None,self.terminal,self.control)
                 cord.take()
                 self.control.player.inventory.append(cord)
                 self.state = "PRGRAMMING"

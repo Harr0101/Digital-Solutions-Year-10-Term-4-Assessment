@@ -1,4 +1,3 @@
-#DOCSTRINGS DONE
 import pygame
 import sys
 
@@ -141,7 +140,9 @@ class Terminal():
         '''
         for event in events:
             if event.type == pygame.QUIT:
-                self.endGame("")
+                #self.endGame("")
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN and self.listening:
                 if event.key == pygame.K_a:
                     self.text += "a"
@@ -258,24 +259,28 @@ class Terminal():
                 self.possibleCommands = []
                 for command in self.control.commandsToActions.keys(): 
                     if command[:len(self.text)] == self.text.lower():
-                        self.possibleCommands.append(command)
+                        self.possibleCommands.append(self.font.render(command, 1, (255,255,255),(0,0,0)))
 
                 for command in self.control.player.inventory + self.control.currentRoom.items:
                     command = command.name
                     if command[:len(self.text)].lower() == self.text:
-                        self.possibleCommands.append(command)
+                        self.possibleCommands.append(self.font.render(command, 1, (255,255,255),(0,0,0)))
 
             else:
                 self.possibleCommands = []
                 for command in self.control.commandsToActions.keys(): 
-                    self.possibleCommands.append(command)
+                    self.possibleCommands.append(self.font.render(command, 1, (255,255,255),(0,0,0)))
                 for command in self.control.player.inventory + self.control.currentRoom.items:
                     command = command.name
-                    self.possibleCommands.append(command)
+                    self.possibleCommands.append(self.font.render(command, 1, (255,255,255),(0,0,0)))
+            
+            if self.possibleCommands:
+                width = max([i.get_rect().right for i in self.possibleCommands])
+                numCommands = len(self.possibleCommands)
+                pygame.draw.rect(self.win,(0,0,0),(0,self.screenSize[1]-20-20*numCommands,width,20*numCommands),0,20)
 
             for i in range(len(self.possibleCommands)):
-                textPic = self.font.render(self.possibleCommands[i], 1, (255,255,255),(0,0,0))
-                self.win.blit(textPic,(0,self.screenSize[1]-40-20*i))
+                self.win.blit(self.possibleCommands[i],(0,self.screenSize[1]-40-20*i))
 
         pygame.display.flip()
 
@@ -305,8 +310,8 @@ class Terminal():
 
     def endGame(self,command):
         ''' Ends game and terminal '''
-        pygame.quit()
-        sys.exit()
+        pygame.event.post(pygame.event.Event(pygame.QUIT))
+        
     
     def stopCommands(self):
         ''' Stop player from inputting commands '''

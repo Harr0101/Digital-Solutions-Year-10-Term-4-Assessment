@@ -1,8 +1,6 @@
-#DOCSTRINGS DONE
+import random
 from computer import Computer
 from terminal import Terminal
-import sys
-import random
 from room import Room, Area
 from door import Door, LockedDoor
 from control import Control
@@ -85,7 +83,8 @@ for i in range(2):
         
         
     programmingDesks.append(programmingDeskRow)
-    
+
+Item("Bin","Filled with bits of paper",True,programmingDesks[1][0],terminal,control)
 
 # Creating Engineering Room
 engineeringRoom = Room("Engineering Office", "The walls are occupied by a series of computer stations and 3D printers, in the centre there is a large worktable", True,terminal)
@@ -93,18 +92,27 @@ for i in range(4):
     Engineer(name(),Weapon("Wrench","Normally used for undoing nuts",2,terminal,control),engineeringRoom,terminal,control)
 password = Computer(engineeringRoom,terminal,control).getPassword()
 Note("yellow sticky note covered in stains",password,engineeringRoom,False,terminal,control)
+Item("Worktable","It is square with a side length of 3m",False,engineeringRoom,terminal,control)
+Item("3D Printer","Uses additive manufacturing to create quick prototypes",False,engineeringRoom,terminal,control)
 
 # Creating Marketting Room
 markettingRoom = Room("Marketting Office", "Just a bunch of computers and a giant colour palette poster", True,terminal)
 for i in range(4):
     Character(name(),"Works on creating a positive public image",None,markettingRoom,terminal,control)
+Item("Desk","Cheaply bought from a flatpack furniture store",False,markettingRoom,terminal,control)
 
 # Creating Lunch Room
 lunchRoom = Room("Lunch Room", "There's a mini kitchenette to the east, and several tables fill the rest of the room", True,terminal)
+Item("Cooker","Heats and hydrates food quickly from its dehydrated state",True,lunchRoom,terminal,control)
+Item("Sink","A simple stainless steel sink",False,lunchRoom,terminal,control)
+for i in range(3):
+    Item("Table","Constructed from plastic, although fairly sturdy",False,lunchRoom,terminal,control)
 
 # Create Waiting Room
 waitingRoom = Room("Waiting Room", "Nothing to see here, just a threadbare couch", True,terminal)
 clerk = Character(name(),"Serves people who wish to see the CEO",None,waitingRoom,terminal,control)
+Item("Couch","This used to be blue, you think. It's covered in dust and dirt - visitors would rather stand",False,waitingRoom,terminal,control)
+Item("Desk","Cheaply bought from a flatpack furniture store",False,waitingRoom,terminal,control)
 
 
 # Creating CEO's Office
@@ -120,10 +128,32 @@ Item("Quantum Computer", "Processes complicated algorithms in seconds that would
 # Creating Main Corridor
 mainCorridor = Room("Main Corridor", "There is nowhere to hide",True, terminal)
 
+decorations = [lambda room: Item("Plant","Adds greenery to the corridors",True,room,terminal,control),
+                lambda room: Item("Plant","Adds greenery to the corridors",True,room,terminal,control),
+                lambda room: Item("Plant","Adds greenery to the corridors",True,room,terminal,control),
+                lambda room: Item("Plant","Adds greenery to the corridors",True,room,terminal,control),
+                lambda room: Item("Plant","Adds greenery to the corridors",True,room,terminal,control),
+                lambda room: Item("Plant","Adds greenery to the corridors",True,room,terminal,control),
+                lambda room: Item("Lockers","A row of lockers, positioned 1.2 m from the floor",False,room,terminal,control),
+                lambda room: Item("Lockers","A row of lockers, positioned 1.2 m from the floor",False,room,terminal,control),
+                lambda room: Item("Lockers","A row of lockers, positioned 1.2 m from the floor",False,room,terminal,control),
+                lambda room: Item("Pidgeon Holes","A row of pidgeon holes, each is a 30 cm cube",False,room,terminal,control),
+                lambda room: Item("Pidgeon Holes","A row of pidgeon holes, each is a 30 cm cube",False,room,terminal,control),
+                lambda room: Item("Pidgeon Holes","A row of pidgeon holes, each is a 30 cm cube",False,room,terminal,control),
+                lambda room: Item("Vest rack","Occupied by 25 high-vis vests",True,room,terminal,control),
+                lambda room: Item("Notice board","A cork board that was last used in the 20th century, about 200 years ago",False,room,terminal,control),
+                None,
+                None,
+                None]
+        
+random.shuffle(decorations)
+
 mainCorridorRooms = []
 for i in range(17):
     newArea = Area("Main Corridor","The floors are white, as are the walls",terminal,mainCorridor)
     mainCorridorRooms.append(newArea)
+    if decorations[i] is not None:
+        decorations[i](newArea)
     if i != 0:
         if i<12:
             newArea.sides["north"] = mainCorridorRooms[i-1]
@@ -354,8 +384,6 @@ terminal.descriptionAdd("")
 terminal.descriptionAdd("")
 control.currentRoom.describe()
 
-try:
-    while not(control.completedCheck.run()):
-        control.runAll()
-finally:
-    pass
+
+while not(control.completedCheck.run()):
+    control.runAll()

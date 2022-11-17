@@ -1,4 +1,3 @@
-#DOCSTRINGS DONE
 from door import LockedDoor
 
 
@@ -74,7 +73,7 @@ class Item():
             self.terminal.descriptionAdd(f"You put {self.name} in your inventory")
             return True
         else:
-            self.terminal.descriptionAdd(f"You can't put put {self.name} in your inventory")
+            self.terminal.descriptionAdd(f"You can't put {self.name} in your inventory")
             return False
 
     def describe(self):

@@ -1,5 +1,3 @@
-#DOCSTRINGS DONE
-
 class CompletionCheck():
     """
     A class to represent a character.

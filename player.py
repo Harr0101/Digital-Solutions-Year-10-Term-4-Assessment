@@ -1,4 +1,3 @@
-#DOCSTRINGS DONE
 from character import Character
 from robots import *
 
@@ -43,7 +42,7 @@ class Player(Character):
         super().__init__("you",description,startingWeapon, None,terminal,control)
 
         control.completedCheck.enemies -= 1
-        self.hp = 1000000
+        self.hp = 20
         self.mechanics = sentry
 
         self.focus = None

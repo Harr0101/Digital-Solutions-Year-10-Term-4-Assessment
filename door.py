@@ -1,5 +1,3 @@
-#DOCSTRINGS DONE
-
 class Door():
     """
     A class to represent a door.

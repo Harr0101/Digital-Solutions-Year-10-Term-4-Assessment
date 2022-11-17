@@ -1,4 +1,3 @@
-#DOCSTRINGS DONE
 from random import choice
 
 from character import Character

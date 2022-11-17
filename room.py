@@ -1,4 +1,3 @@
-#DOCSTRINGS DONE
 class Room():
     """
     A class to represent a room.
